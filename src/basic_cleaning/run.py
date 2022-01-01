@@ -34,12 +34,16 @@ def go(args):
     logger.info("Converting last_review to datetime type")
     df['last_review'] = pd.to_datetime(df['last_review'])
 
-    #Save new df to CSV without the index column
+    # Drop rows in the dataset that are not in the proper geolocation.
+    idx = df['longitude'].between(-74.25, -73.50) & df['latitude'].between(40.5, 41.2)
+    df = df[idx].copy()
+
+    # Save new df to CSV without the index column
     logger.info("Saving new CSV")
     filename = "clean_sample.csv"
     df.to_csv(filename, index=False)
 
-    #Upload the file to W&B
+    # Upload the file to W&B
     logger.info("Creating artifact")
     artifact = wandb.Artifact(
         name=args.output_artifact,
